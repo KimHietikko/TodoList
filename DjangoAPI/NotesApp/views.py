@@ -36,3 +36,13 @@ def noteApi(request,id=0):
         note=Notes.objects.get(id=id)
         note.delete()
         return JsonResponse("Deleted Successfully!!", safe=False)
+
+@csrf_exempt
+def dragAndDrop(request):
+    Notes.objects.all().delete()
+    note_data=JSONParser().parse(request)
+    note_serializer = NoteSerializer(data=note_data, many=True)
+    if note_serializer.is_valid():
+        note_serializer.save()
+        return JsonResponse("Added Successfully!!" , safe=False)
+    return JsonResponse("Failed to Add.",safe=False)

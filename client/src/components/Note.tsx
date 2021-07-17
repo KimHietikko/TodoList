@@ -18,18 +18,17 @@ class Note extends Component<NoteProps, NoteState> {
     constructor(props: any) {
         super(props);
         this.state = {
-            edit: { id: null, value: '', index: null }
+            edit: { id: null, value: '' }
         };
         this.submitUpdate = this.submitUpdate.bind(this);
     }
 
     submitUpdate(value: any) {
-        this.props.updateTodo(this.state.edit.id, value, this.state.edit.index);
+        this.props.updateTodo(this.state.edit.id, value);
         this.setState({
             edit: {
                 id: null,
-                value: '',
-                index: null
+                value: ''
             }
         });
     }
@@ -46,7 +45,7 @@ class Note extends Component<NoteProps, NoteState> {
 
                             <div className="icons">
                                 <RiCloseCircleLine onClick={() => this.props.removeTodo(todo.id)} className="delete-icon" />
-                                <TiEdit onClick={() => this.setState({ edit: { id: todo.id, value: todo.text, index: todo.index } })} className="edit-icon" />
+                                <TiEdit onClick={() => this.setState({ edit: { id: todo.id, value: todo.text } })} className="edit-icon" />
                             </div>
                         </div>
                     )}

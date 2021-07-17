@@ -31,14 +31,10 @@ class Notes extends Component<NotesProps, NotesState> {
         const [reorderedItem] = items.splice(result.source.index, 1);
         items.splice(result.destination.index, 0, reorderedItem);
 
-        fetch(process.env.REACT_APP_API + 'note', {
-            method: 'PUT',
+        fetch(process.env.REACT_APP_API + 'note/dragAndDrop', {
+            method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: reorderedItem.id,
-                text: reorderedItem.text,
-                index: result.destination.index
-            })
+            body: JSON.stringify(items)
         }).then(res => {
             this.setState({ todos: items });
             this.refreshList();
@@ -55,15 +51,14 @@ class Notes extends Component<NotesProps, NotesState> {
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: null,
-                text: todo.text,
-                index: this.state.todos.length
+                text: todo.text
             })
         }).then(res => {
             this.refreshList();
         });
     }
 
-    updateTodo(todoId: number, newValue: any, index: number) {
+    updateTodo(todoId: number, newValue: any) {
         if (!newValue.text || /^\s*$/.test(newValue.text)) {
             return;
         }
@@ -73,8 +68,7 @@ class Notes extends Component<NotesProps, NotesState> {
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: todoId,
-                text: newValue.text,
-                index: index
+                text: newValue.text
             })
         }).then(res => {
             this.refreshList();
@@ -94,9 +88,6 @@ class Notes extends Component<NotesProps, NotesState> {
         fetch(process.env.REACT_APP_API + 'note')
             .then(response => response.json())
             .then(data => {
-                data = data.sort(function (a: any, b: any) {
-                    return a.index - b.index;
-                });
                 this.setState({ todos: data });
             });
     }
