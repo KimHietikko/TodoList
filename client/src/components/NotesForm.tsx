@@ -26,7 +26,6 @@ export class NotesForm extends Component<NotesFormProps, NotesFormState> {
         e.preventDefault();
 
         this.props.onSubmit({
-            id: Math.floor(Math.random() * 10000),
             text: this.state.input
         });
         this.setState({ input: '' });
@@ -34,19 +33,19 @@ export class NotesForm extends Component<NotesFormProps, NotesFormState> {
 
     render() {
         return (
-            <form onSubmit={this.handleSubmit} className="todo-form">
+            <form onSubmit={this.handleSubmit} className="note-form">
                 {this.props.edit ? (
                     <>
-                        <input placeholder="Update your item" value={this.state.input} onChange={this.handleChange} name="text" className="todo-input edit" />
-                        <button onClick={this.handleSubmit} className="todo-button edit">
+                        <input placeholder="Update your note" maxLength={2000} value={this.state.input} onChange={this.handleChange} name="text" className="note-input edit" />
+                        <button onClick={this.handleSubmit} className="note-button edit">
                             Update
                         </button>
                     </>
                 ) : (
                     <>
-                        <input placeholder="Add a todo" value={this.state.input} onChange={this.handleChange} name="text" className="todo-input" />
-                        <button onClick={this.handleSubmit} className="todo-button">
-                            Add todo
+                        <input placeholder="Add a note" maxLength={2000} value={this.state.input} onChange={this.handleChange} name="text" className="note-input" />
+                        <button onClick={this.handleSubmit} className="note-button">
+                            Add note
                         </button>
                     </>
                 )}

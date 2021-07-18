@@ -1,10 +1,10 @@
 import { Component } from 'react';
 import NotesForm from './NotesForm';
-import Note from './Note';
+import NoteCard from './NoteCard';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 type NotesState = {
-    todos: Array<any>;
+    notes: Array<any>;
 };
 
 type NotesProps = {
@@ -12,22 +12,22 @@ type NotesProps = {
     onSubmit?: any;
 };
 
-class Notes extends Component<NotesProps, NotesState> {
+class NotesComponent extends Component<NotesProps, NotesState> {
     constructor(props: any) {
         super(props);
         this.state = {
-            todos: []
+            notes: []
         };
         this.handleOnDragEnd = this.handleOnDragEnd.bind(this);
-        this.addTodo = this.addTodo.bind(this);
-        this.updateTodo = this.updateTodo.bind(this);
-        this.removeTodo = this.removeTodo.bind(this);
+        this.addNote = this.addNote.bind(this);
+        this.updateNote = this.updateNote.bind(this);
+        this.removeNote = this.removeNote.bind(this);
     }
 
     handleOnDragEnd(result: any) {
         if (!result.destination) return;
 
-        const items = Array.from(this.state.todos);
+        const items = Array.from(this.state.notes);
         const [reorderedItem] = items.splice(result.source.index, 1);
         items.splice(result.destination.index, 0, reorderedItem);
 
@@ -36,13 +36,13 @@ class Notes extends Component<NotesProps, NotesState> {
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(items)
         }).then(res => {
-            this.setState({ todos: items });
+            this.setState({ notes: items });
             this.refreshList();
         });
     }
 
-    addTodo(todo: any) {
-        if (!todo.text || /^\s*$/.test(todo.text)) {
+    addNote(note: any) {
+        if (!note.text || /^\s*$/.test(note.text)) {
             return;
         }
 
@@ -51,14 +51,14 @@ class Notes extends Component<NotesProps, NotesState> {
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: null,
-                text: todo.text
+                text: note.text
             })
         }).then(res => {
             this.refreshList();
         });
     }
 
-    updateTodo(todoId: number, newValue: any) {
+    updateNote(noteId: number, newValue: any) {
         if (!newValue.text || /^\s*$/.test(newValue.text)) {
             return;
         }
@@ -67,7 +67,7 @@ class Notes extends Component<NotesProps, NotesState> {
             method: 'PUT',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                id: todoId,
+                id: noteId,
                 text: newValue.text
             })
         }).then(res => {
@@ -75,7 +75,7 @@ class Notes extends Component<NotesProps, NotesState> {
         });
     }
 
-    removeTodo(id: number | string) {
+    removeNote(id: number | string) {
         fetch(process.env.REACT_APP_API + 'note/' + id, {
             method: 'DELETE',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' }
@@ -88,7 +88,7 @@ class Notes extends Component<NotesProps, NotesState> {
         fetch(process.env.REACT_APP_API + 'note')
             .then(response => response.json())
             .then(data => {
-                this.setState({ todos: data });
+                this.setState({ notes: data });
             });
     }
 
@@ -99,13 +99,13 @@ class Notes extends Component<NotesProps, NotesState> {
     render() {
         return (
             <>
-                <h1>What's the Plan for Today?</h1>
-                <NotesForm onSubmit={this.addTodo} />
+                <h1>What's on your mind?</h1>
+                <NotesForm onSubmit={this.addNote} />
                 <DragDropContext onDragEnd={this.handleOnDragEnd}>
-                    <Droppable droppableId="todo-row">
+                    <Droppable droppableId="note-row">
                         {provided => (
                             <div ref={provided.innerRef} {...provided.droppableProps}>
-                                <Note todos={this.state.todos} removeTodo={this.removeTodo} updateTodo={this.updateTodo} />
+                                <NoteCard notes={this.state.notes} removeNote={this.removeNote} updateNote={this.updateNote} />
 
                                 {provided.placeholder}
                             </div>
@@ -117,4 +117,4 @@ class Notes extends Component<NotesProps, NotesState> {
     }
 }
 
-export default Notes;
+export default NotesComponent;

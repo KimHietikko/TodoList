@@ -1,10 +1,10 @@
 import './App.css';
-import Notes from './components/Notes';
+import NotesComponent from './components/NotesComponent';
 
 function App() {
     return (
-        <div className="todo-app">
-            <Notes></Notes>
+        <div className="notes-app">
+            <NotesComponent></NotesComponent>
         </div>
     );
 }
