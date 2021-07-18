@@ -24,7 +24,7 @@ class NoteCard extends Component<NoteProps, NoteState> {
     }
 
     submitUpdate(value: any) {
-        this.props.updateNote(this.state.edit.id, value);
+        this.props.updateNote(this.state.edit.id, value, this.state.edit.index);
         this.setState({
             edit: {
                 id: null,
@@ -45,7 +45,7 @@ class NoteCard extends Component<NoteProps, NoteState> {
 
                             <div className="icons">
                                 <RiCloseCircleLine onClick={() => this.props.removeNote(note.id)} className="delete-icon" />
-                                <TiEdit onClick={() => this.setState({ edit: { id: note.id, value: note.text } })} className="edit-icon" />
+                                <TiEdit onClick={() => this.setState({ edit: { id: note.id, value: note.text, index: note.index } })} className="edit-icon" />
                             </div>
                         </div>
                     )}

@@ -31,14 +31,29 @@ class NotesComponent extends Component<NotesProps, NotesState> {
         const [reorderedItem] = items.splice(result.source.index, 1);
         items.splice(result.destination.index, 0, reorderedItem);
 
-        fetch(process.env.REACT_APP_API + 'note/dragAndDrop', {
-            method: 'POST',
+        const previousItem = items[result.destination.index - 1];
+        const nextItem = items[result.destination.index + 1];
+
+        if (!nextItem?.index && previousItem?.index) {
+            reorderedItem.index = Math.round(previousItem?.index + 10000);
+        } else if (!previousItem?.index && nextItem?.index) {
+            reorderedItem.index = Math.round((0 + nextItem?.index) / 2);
+        } else {
+            reorderedItem.index = Math.round((previousItem?.index + nextItem?.index) / 2);
+        }
+
+        fetch(process.env.REACT_APP_API + 'note', {
+            method: 'PUT',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-            body: JSON.stringify(items)
-        }).then(res => {
-            this.setState({ notes: items });
-            this.refreshList();
-        });
+            body: JSON.stringify(reorderedItem)
+        })
+            .then(res => {
+                this.refreshList();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.refreshList();
+            });
     }
 
     addNote(note: any) {
@@ -51,14 +66,20 @@ class NotesComponent extends Component<NotesProps, NotesState> {
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: null,
-                text: note.text
+                text: note.text,
+                index: (this.state.notes[this.state.notes.length - 1]?.index || 0) + 10000
             })
-        }).then(res => {
-            this.refreshList();
-        });
+        })
+            .then(res => {
+                this.refreshList();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.refreshList();
+            });
     }
 
-    updateNote(noteId: number, newValue: any) {
+    updateNote(noteId: number, newValue: any, noteIndex: number) {
         if (!newValue.text || /^\s*$/.test(newValue.text)) {
             return;
         }
@@ -68,26 +89,40 @@ class NotesComponent extends Component<NotesProps, NotesState> {
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: noteId,
-                text: newValue.text
+                text: newValue.text,
+                index: noteIndex
             })
-        }).then(res => {
-            this.refreshList();
-        });
+        })
+            .then(res => {
+                this.refreshList();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.refreshList();
+            });
     }
 
     removeNote(id: number | string) {
         fetch(process.env.REACT_APP_API + 'note/' + id, {
             method: 'DELETE',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' }
-        }).then(res => {
-            this.refreshList();
-        });
+        })
+            .then(res => {
+                this.refreshList();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.refreshList();
+            });
     }
 
     refreshList() {
         fetch(process.env.REACT_APP_API + 'note')
             .then(response => response.json())
             .then(data => {
+                data.sort(function (a: any, b: any) {
+                    return a.index - b.index;
+                });
                 this.setState({ notes: data });
             });
     }
